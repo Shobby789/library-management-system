@@ -1,0 +1,28 @@
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: "IBM Plex Sans", sans-serif;
+}
+
+.primary-text {
+  @apply text-[#25388C];
+}
+
+.secondary-text {
+  @apply text-gray-500;
+}
+
+.primary-bg {
+  @apply bg-[#25388C];
+}
+
+.section-heading {
+  @apply text-xl font-semibold;
+}
