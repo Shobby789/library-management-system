@@ -1,10 +1,27 @@
-import React from "react";
 import { GoTrash } from "react-icons/go";
 import { RiEditLine } from "react-icons/ri";
 import { Link, useNavigate } from "react-router-dom";
+import { useGetBooksQuery } from "../../services/books/books.service";
+import Loader from "../Global/Loader";
+import { useEffect } from "react";
 
 const BooksList = () => {
   const navigate = useNavigate();
+  const { data, error, isLoading, refetch } = useGetBooksQuery(undefined, {
+    refetchOnFocus: true,
+  });
+
+  useEffect(() => {
+    refetch();
+  }, []);
+
+  if (error) {
+    return (
+      <div className="w-full flex justify-center pt-10">
+        <h2>Something went wrong.</h2>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full bg-white rounded-xl p-6">
@@ -28,63 +45,69 @@ const BooksList = () => {
         </div>
       </div>
 
-      <div className="relative overflow-x-auto my-5">
-        <table className="w-full text-sm text-left rtl:text-righ">
-          <thead className="text-xs text-[#3A354E] bg-[#F8F8FF]">
-            <tr>
-              <th scope="col" className="px-6 py-4">
-                Name
-              </th>
-              <th scope="col" className="px-6 py-4">
-                Author
-              </th>
-              <th scope="col" className="px-6 py-4">
-                Genre
-              </th>
-              <th scope="col" className="px-6 py-4">
-                Date Created
-              </th>
-              <th scope="col" className="px-6 py-4">
-                Action
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {[1, 2, 3, 4, 5, 6, 7]?.map((_, index) => (
-              <tr
-                className="bg-white border-b border-gray-200 cursor-pointer"
-                key={index}
-                onClick={() => navigate("/books/owihoiwrh98r39ry3")}
-              >
-                <th
-                  scope="row"
-                  className="px-6 py-4 font-medium whitespace-nowrap flex items-center gap-2"
-                >
-                  <img
-                    src="/book01.png"
-                    alt="book01"
-                    className="w-[29px] h-[40px]"
-                  />
-                  <div className="">
-                    <span>The Great Reclamation: A Novel by</span>
-                  </div>
+      {isLoading ? (
+        <Loader />
+      ) : (
+        <div className="relative overflow-x-auto my-5">
+          <table className="w-full text-sm text-left rtl:text-righ">
+            <thead className="text-xs text-[#3A354E] bg-[#F8F8FF]">
+              <tr>
+                <th scope="col" className="px-6 py-4">
+                  Name
                 </th>
-                <td className="px-6 py-4">Rachel Hxeng</td>
-                <td className="px-6 py-4">Strategic, Fantasy</td>
-                <td className="px-6 py-4">Dec 19 2023</td>
-                <td className="px-6 text-center flex gap-2">
-                  <button type="button">
-                    <RiEditLine className="text-[17px] text-blue-500" />
-                  </button>
-                  <button type="button">
-                    <GoTrash className="text-base text-red-500" />
-                  </button>
-                </td>
+                <th scope="col" className="px-6 py-4">
+                  Author
+                </th>
+                <th scope="col" className="px-6 py-4">
+                  Genre
+                </th>
+                <th scope="col" className="px-6 py-4">
+                  Date Created
+                </th>
+                <th scope="col" className="px-6 py-4">
+                  Action
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {data?.results?.map((book, index) => (
+                <tr
+                  className="bg-white border-b border-gray-200 cursor-pointer"
+                  key={index}
+                  onClick={() => navigate(`/books/${book?.id}`)}
+                >
+                  <td
+                    scope="row"
+                    className="px-6 py-4 font-medium whitespace-nowrap flex items-center gap-2 max-w-[300px]"
+                  >
+                    <img
+                      src={book?.formats?.image}
+                      alt="book01"
+                      className="w-[29px] h-[40px]"
+                    />
+                    <span className="text-wrap">
+                      {book?.title?.slice(0, 30)}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4">{book?.authors[0]?.name}</td>
+                  <td className="px-6 py-4">
+                    {book?.subjects[0]?.slice(0, 30)}...
+                  </td>
+                  <td className="px-6 py-4">Dec 19 2023</td>
+                  <td className="px-6 text-center flex gap-2">
+                    <button type="button">
+                      <RiEditLine className="text-[17px] text-blue-500" />
+                    </button>
+                    <button type="button">
+                      <GoTrash className="text-base text-red-500" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 };

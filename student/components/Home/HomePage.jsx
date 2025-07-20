@@ -4,10 +4,10 @@ import Listing from "./Listing";
 
 const HomePage = () => {
   return (
-    <>
+    <React.Fragment>
       <Header />
       <Listing />
-    </>
+    </React.Fragment>
   );
 };
 

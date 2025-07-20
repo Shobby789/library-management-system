@@ -13,11 +13,11 @@
 }
 
 body {
-  /* overflow: hidden;
+  /* overflow: hidden; */
   width: 100%;
-  background-image: url("/bg.png");
-  background-size: cover;
-  background-position: center; */
+  background-image: url("/book-details-bg.png");
+  /* background-size: cover; */
+  /* background-position: center; */
   background-color: #090c15;
   color: white;
 }

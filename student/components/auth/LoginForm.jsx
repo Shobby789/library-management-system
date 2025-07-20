@@ -5,16 +5,55 @@ import { FaRegEyeSlash } from "react-icons/fa6";
 import Button from "../Common/Button";
 import Link from "next/link";
 import Image from "next/image";
+import { useFormik } from "formik";
+import { useRouter } from "next/navigation";
+
+const validate = (values) => {
+  const errors = {};
+
+  if (!values.email) {
+    errors.email = "Email is required";
+  } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
+    errors.email = "Invalid email address";
+  }
+
+  if (!values.password) {
+    errors.password = "Password is required";
+  } else if (values.password.length < 8) {
+    errors.password = "Password cannot be less than 8 characters";
+  }
+
+  return errors;
+};
 
 const LoginForm = () => {
   const [showPass, setShowPass] = useState(false);
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
   const togglePassword = () => {
     setShowPass((prev) => !prev);
+    console.log(showPass);
   };
 
+  const formik = useFormik({
+    initialValues: {
+      email: "",
+      password: "",
+    },
+    validate,
+    onSubmit: (values, { resetForm }) => {
+      console.log(values);
+      resetForm();
+      router.push("/");
+    },
+  });
+
   return (
-    <form className="w-full flex flex-col items-start justify-center gap-6 w-full lg:w-[80%] p-6 lg:p-10 xl:p-14 rounded-xl bg-[#12151F]">
+    <form
+      onSubmit={formik.handleSubmit}
+      className="w-full lg:w-[80%] flex flex-col items-start justify-center gap-6"
+    >
       <Image
         src={"/logo.png"}
         width={172}
@@ -37,9 +76,15 @@ const LoginForm = () => {
           type="email"
           name="email"
           id="email"
+          value={formik.values.email}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
           className="bg-[#232839] p-3 secondary-text w-full outline-none rounded-md"
           placeholder="adrian@jsmastery.pro"
         />
+        {formik.touched.email && formik.errors.email ? (
+          <p className="text-sm text-red-600">{formik.errors.email}</p>
+        ) : null}
       </div>
       <div className="w-full flex flex-col items-start gap-1">
         <label htmlFor="password" className="secondary-text">
@@ -50,21 +95,33 @@ const LoginForm = () => {
             type={showPass ? "text" : "password"}
             name="password"
             id="password"
+            value={formik.values.password}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
             className="secondary-text w-full outline-none bg-transparent"
             placeholder="Atleast 8 characters long"
           />
           <button type="button" onClick={() => togglePassword()}>
             {showPass ? (
-              <FaRegEyeSlash className="secondary-text text-base" />
-            ) : (
               <FaRegEye className="secondary-text text-base" />
+            ) : (
+              <FaRegEyeSlash className="secondary-text text-base" />
             )}
           </button>
         </div>
+        {formik.touched.password && formik.errors.password ? (
+          <p className="text-sm text-red-600">{formik.errors.password}</p>
+        ) : null}
       </div>
 
-      <div className="w-full mt-2">
-        <Button text={"Login"} type={"submit"} />
+      {/* <div className="w-full flex justify-end">
+        <Link href={`/login`} className="secondary-text text-sm font-medium">
+          Forgot Password?
+        </Link>
+      </div> */}
+
+      <div className="w-full mt-3">
+        <Button text={"Login"} type={"submit"} loading={loading} />
       </div>
 
       <p className="secondary-text font-medium text-center mt-2 mx-auto">

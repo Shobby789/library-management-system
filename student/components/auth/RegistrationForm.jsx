@@ -5,16 +5,69 @@ import { FaRegEyeSlash } from "react-icons/fa6";
 import Button from "../Common/Button";
 import Link from "next/link";
 import Image from "next/image";
+import { useFormik } from "formik";
+import { useRouter } from "next/navigation";
+
+const validate = (values) => {
+  const errors = {};
+
+  if (!values.fullName) {
+    errors.fullName = "Name is required";
+  } else if (values.fullName.length < 3) {
+    errors.fullName = "Name can not be less than 3 characters";
+  }
+
+  if (!values.email) {
+    errors.email = "Email is required";
+  } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
+    errors.email = "Invalid email address";
+  }
+
+  if (!values.idNumber) {
+    errors.idNumber = "ID number is required";
+  } else if (values.idNumber.length !== 13) {
+    errors.idNumber = "ID number must contain 13 digits";
+  }
+
+  if (!values.password) {
+    errors.password = "Password is required";
+  } else if (values.password.length < 8) {
+    errors.password = "Password cannot be less than 8 characters";
+  }
+
+  return errors;
+};
 
 const RegistrationForm = () => {
   const [showPass, setShowPass] = useState(false);
+  const router = useRouter();
+  const [loading, setLoading] = useState(false)
 
   const togglePassword = () => {
     setShowPass((prev) => !prev);
   };
 
+  const formik = useFormik({
+    initialValues: {
+      fullName: "",
+      email: "",
+      idNumber: "",
+      password: "",
+    },
+    validate,
+    onSubmit: async (values, { resetForm }) => {
+      console.log("values >>>", values);
+      resetForm();
+
+      router.push("/login");
+    },
+  });
+
   return (
-    <form className="w-full flex flex-col items-start justify-center gap-6 md:w-[80%] p-6 lg:p-10 xl:p-14 rounded-xl bg-[#12151F]">
+    <form
+      onSubmit={formik.handleSubmit}
+      className="w-full flex flex-col items-start justify-center gap-6 md:w-[80%]"
+    >
       <Image
         src={"/logo.png"}
         width={172}
@@ -31,16 +84,22 @@ const RegistrationForm = () => {
       </p>
 
       <div className="w-full flex flex-col items-start gap-1 mt-3">
-        <label htmlFor="name" className="secondary-text">
+        <label htmlFor="fullName" className="secondary-text">
           Full name
         </label>
         <input
           type="text"
-          name="name"
-          id="name"
+          name="fullName"
+          id="fullName"
+          value={formik.values.fullName}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
           className="bg-[#232839] p-3 secondary-text w-full outline-none rounded-md"
           placeholder="adrian@jsmastery.pro"
         />
+        {formik.touched.fullName && formik.errors.fullName ? (
+          <p className="text-red-600 text-sm">{formik.errors.fullName}</p>
+        ) : null}
       </div>
       <div className="w-full flex flex-col items-start gap-1">
         <label htmlFor="email" className="secondary-text">
@@ -50,9 +109,15 @@ const RegistrationForm = () => {
           type="email"
           name="email"
           id="email"
+          value={formik.values.email}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
           className="bg-[#232839] p-3 secondary-text w-full outline-none rounded-md"
           placeholder="adrian@jsmastery.pro"
         />
+        {formik.touched.email && formik.errors.email ? (
+          <p className="text-red-600 text-sm">{formik.errors.email}</p>
+        ) : null}
       </div>
       <div className="w-full flex flex-col items-start gap-1">
         <label htmlFor="idNumber" className="secondary-text">
@@ -62,9 +127,15 @@ const RegistrationForm = () => {
           type="text"
           name="idNumber"
           id="idNumber"
+          value={formik.values.idNumber}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
           className="bg-[#232839] p-3 secondary-text w-full outline-none rounded-md"
           placeholder="eg: 394365762"
         />
+        {formik.touched.idNumber && formik.errors.idNumber ? (
+          <p className="text-red-600 text-sm">{formik.errors.idNumber}</p>
+        ) : null}
       </div>
       <div className="w-full flex flex-col items-start gap-1">
         <label htmlFor="password" className="secondary-text">
@@ -75,21 +146,27 @@ const RegistrationForm = () => {
             type={showPass ? "text" : "password"}
             name="password"
             id="password"
+            value={formik.values.password}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
             className="secondary-text w-full outline-none bg-transparent"
             placeholder="Atleast 8 characters long"
           />
           <button type="button" onClick={() => togglePassword()}>
             {showPass ? (
-              <FaRegEyeSlash className="secondary-text text-base" />
-            ) : (
               <FaRegEye className="secondary-text text-base" />
+            ) : (
+              <FaRegEyeSlash className="secondary-text text-base" />
             )}
           </button>
         </div>
+        {formik.touched.password && formik.errors.password ? (
+          <p className="text-red-600 text-sm">{formik.errors.password}</p>
+        ) : null}
       </div>
 
       <div className="w-full mt-2">
-        <Button text={"Register"} type={"submit"} />
+        <Button text={"Register"} type={"submit"} loading={loading}/>
       </div>
 
       <p className="secondary-text font-medium text-center mt-2 mx-auto">
